@@ -1,13 +1,10 @@
-// Prisma schema for tk-auto-reply
-// Lightweight SQLite database
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
-  // url is now configured in prisma.config.ts (Prisma 7+)
+  url      = env("DATABASE_URL")
 }
 
 // TikTok 用户（与脚本上报的 tiktokUserId 关联）
