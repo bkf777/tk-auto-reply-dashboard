@@ -18,6 +18,9 @@ model TikTokUser {
   updatedAt    DateTime @updatedAt
   sessions     Session[]
   messages     Message[]
+  webSocketConnections WebSocketConnection[]
+
+  @@index([tiktokUserId])
 }
 
 // 会话（每个 TikTok 用户可以有多个会话，便于区分不同对话上下文）
@@ -50,4 +53,24 @@ model Message {
 
   @@index([sessionId])
   @@index([createdAt])
+}
+
+// WebSocket 连接追踪
+model WebSocketConnection {
+  id              String   @id @default(cuid())
+  connectionId    String   @unique // WS 连接唯一标识
+  userId          String?  // 可选关联 TikTok 用户
+  user            TikTokUser? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userAgent       String?  // 客户端信息
+  ipAddress       String?  // 客户端 IP
+  connectedAt     DateTime @default(now())
+  disconnectedAt  DateTime? // 断开连接时间
+  lastHeartbeatAt DateTime @default(now())
+  status          String   @default("active") // "active" | "disconnected"
+  messageCount    Int      @default(0) // 该连接发送的消息数
+  metadata        String?  // JSON，可存其他信息
+
+  @@index([userId])
+  @@index([status])
+  @@index([connectedAt])
 }

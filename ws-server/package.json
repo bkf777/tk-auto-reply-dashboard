@@ -1,0 +1,15 @@
+{
+  "name": "ws-server",
+  "version": "1.0.0",
+  "description": "WebSocket server for tracking connections",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0",
+    "@prisma/client": "^5.22.0"
+  }
+}

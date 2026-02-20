@@ -3,40 +3,48 @@ import { prisma } from '@/lib/prisma'
 
 // GET /api/user - 获取用户列表及最近会话
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url)
-  const limit = parseInt(searchParams.get('limit') || '50')
+  try {
+    const { searchParams } = new URL(req.url)
+    const limit = parseInt(searchParams.get('limit') || '50')
 
-  const users = await prisma.tikTokUser.findMany({
-    take: limit,
-    orderBy: { createdAt: 'desc' },
-    include: {
-      sessions: {
-        orderBy: { lastActiveAt: 'desc' },
-        take: 1,
-        select: {
-          id: true,
-          title: true,
-          lastActiveAt: true,
-          _count: { select: { messages: true } },
+    const users = await prisma.tikTokUser.findMany({
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        sessions: {
+          orderBy: { lastActiveAt: 'desc' },
+          take: 1,
+          select: {
+            id: true,
+            title: true,
+            lastActiveAt: true,
+            _count: { select: { messages: true } },
+          },
         },
+        _count: { select: { sessions: true } },
       },
-      _count: { select: { sessions: true } },
-    },
-  })
+    })
 
-  const data = users.map((u: any) => ({
-    id: u.id,
-    tiktokUserId: u.tiktokUserId,
-    displayName: u.displayName,
-    avatarUrl: u.avatarUrl,
-    notes: u.notes,
-    createdAt: u.createdAt,
-    updatedAt: u.updatedAt,
-    sessionCount: u._count.sessions,
-    latestSession: u.sessions[0] || null,
-  }))
+    const data = users.map((u: any) => ({
+      id: u.id,
+      tiktokUserId: u.tiktokUserId,
+      displayName: u.displayName,
+      avatarUrl: u.avatarUrl,
+      notes: u.notes,
+      createdAt: u.createdAt,
+      updatedAt: u.updatedAt,
+      sessionCount: u._count.sessions,
+      latestSession: u.sessions[0] || null,
+    }))
 
-  return NextResponse.json({ ok: true, users: data })
+    return NextResponse.json({ ok: true, users: data })
+  } catch (e: any) {
+    console.error('[user GET error]', e)
+    return NextResponse.json(
+      { ok: false, error: e?.message || String(e) },
+      { status: 500 }
+    )
+  }
 }
 
 // POST /api/user - 更新用户备注

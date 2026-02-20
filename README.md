@@ -2,6 +2,16 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+## Environment Variables
+
+Create a `.env.local` file in the project root with these values:
+
+```
+OPENAI_BASE_URL=https://api.qnaigc.com/v1
+OPENAI_API_KEY=your_api_key_here
+OPENAI_MODEL=gpt-4o-mini
+```
+
 First, run the development server:
 
 ```bash
